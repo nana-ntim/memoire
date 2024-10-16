@@ -1,0 +1,70 @@
+body {
+    /* background-color: black; */
+    background-image: url('davi-moreira-t7itPRh7Kkg-unsplash.jpg');
+    background-repeat: repeat; /* Prevent the image from repeating */
+    background-size: cover; /* Adjust the image size to cover the entire background */
+    background-position: center; /* Center the background image */
+}
+
+.main {
+    position: relative;
+    background-color: whitesmoke;
+    padding: 20px;
+    max-width: 400px;
+    margin: 50px auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+} 
+
+
+.main h1 {
+    font-family: "Lucida Handwriting",  cursive;
+    font-size: 28px;
+    color: #333;
+    text-align: center;
+}
+
+.main h3 {
+    font-family: Garamond, serif;
+    font-size: 18px;
+    color: #555;
+    text-align: center;
+}
+
+label {
+    display: block;
+    margin: 10px 0 5px;
+    font-family: Garamond, serif;
+    color: #333;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.wrap {
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #121212;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.para {
+    margin-top: 20px;
+    font-family: Garamond, serif;
+}
+
+.para a {
+    color: rebeccapurple;
+    text-decoration: none;
+}
