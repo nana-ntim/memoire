@@ -1,70 +1,104 @@
-body {
-    /* background-color: black; */
-    background-image: url('davi-moreira-t7itPRh7Kkg-unsplash.jpg');
-    background-repeat: repeat; /* Prevent the image from repeating */
-    background-size: cover; /* Adjust the image size to cover the entire background */
-    background-position: center; /* Center the background image */
+body{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    /* width: 100%; */
+    flex-direction: column;
+    background-color:#121212;   
 }
 
 .main {
-    position: relative;
-    background-color: whitesmoke;
-    padding: 20px;
-    max-width: 400px;
-    margin: 50px auto;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-} 
-
-
-.main h1 {
-    font-family: "Lucida Handwriting",  cursive;
-    font-size: 28px;
-    color: #333;
-    text-align: center;
-}
-
-.main h3 {
-    font-family: Garamond, serif;
-    font-size: 18px;
-    color: #555;
-    text-align: center;
-}
-
-label {
-    display: block;
-    margin: 10px 0 5px;
-    font-family: Garamond, serif;
-    color: #333;
-}
-
-input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-.wrap {
-    margin-top: 20px;
-}
-
-button {
+   
     padding: 10px 20px;
+    width: 500px;
+    text-align: center;
+    color: white; /* Text color changed to white for better readability */
+    /*backdrop-filter: blur(20px); /* Increased blur effect for a more pronounced glass look */
+    background: linear-gradient(135deg,rgba(255,255,255,0.1), rgba(255,255,255,0));
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(30px);
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,018);
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37);
+}
+
+
+
+label{
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: left;
+    color: white;
+    font-weight: bold;
+}
+
+input{
+    display: block;
+    width: 100%;
+    margin-bottom: 25px;
+    padding: 20px;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+button{
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 15px;
+    margin-bottom: 15px;
     border: none;
-    background-color: #121212;
     color: white;
     cursor: pointer;
-    border-radius: 5px;
+    background-color: rgb(195, 147, 36);
+    width: 100%;
+    font-size: 16px;
 }
 
-.para {
-    margin-top: 20px;
-    font-family: Garamond, serif;
+
+.wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.para a {
-    color: rebeccapurple;
-    text-decoration: none;
+button:hover{
+    background-color:rgb(221, 178, 78) ;
 }
+
+h1{
+    color: white;
+}
+
+.wrap-button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.para{
+    text-align: center;
+    font-size: 15px;
+    margin-top: 25px;
+    color:white;
+}
+
+.error {
+    color: red;
+    font-size: 14px;
+}
+
+a {
+    color: rgb(221, 178, 78);
+}
+
+
+
+
+
+
+
