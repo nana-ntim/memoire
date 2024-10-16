@@ -148,6 +148,15 @@ html {
   opacity: 0.7;
 }
 
+.logo {
+  font-size: 28px;
+  margin-bottom: 40px;
+}
+
+.logo-short {
+  display: none;
+}
+
 @media (max-width: 1080px) {
   .entry-grid {
     grid-template-columns: 1fr 1fr;
@@ -161,7 +170,15 @@ html {
   }
 
   .logo {
-    font-size: 18px;
+    font-size: 24px;
+  }
+
+  .logo-full {
+    display: none;
+  }
+
+  .logo-short {
+    display: block;
   }
 
   .menu-item span:not(.menu-icon) {
