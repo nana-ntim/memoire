@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Page</title>
+    <link rel="stylesheet" href="css/registration.css">
+</head>
+<body>
+    <div class="main">
+        <h1>Memoire</h1>
+        <h3>Register</h3>
+    
+
+        <form id="registerForm">
+
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" name="firstName" placeholder="Enter your first name" required>
+            <span id="firstNameError" class="error"></span>
+
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" name="lastName" placeholder="Enter your last name" required>
+            <span id="lastNameError" class="error"></span>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            <span id="emailError" class="error"></span>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            <span id="passwordError" class="error"></span>
+
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" id="password" name="password" placeholder="Confirm your password" required>
+            <span id="confirmPasswordError" class="error"></span>
+
+
+            <div class="wrap">
+                <button type="submit">Submit</button>
+            </div>
+
+
+        </form>
+    </div>
+
+    <p class="para">Already have an account? <a href="login.html">Login here</a></p>
+    <script src="./javascript/registration.js"></script>
+    
+</body>
+</html>
