@@ -1,76 +1,105 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const registerForm = document.getElementById('registerForm');
-    const loginForm = document.getElementById('loginForm');
-    const firstNameInput = document.getElementById('firstName');
-    const lastNameInput = document.getElementById('lastName');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const confirmPasswordInput = document.getElementById('confirmPassword')
-    const emailError = document.getElementById('emailError');
-    const passwordError = document.getElementById('passwordError');
-    const confirmPasswordError = document.getElementById('confirmPasswordError');
+document.addEventListener("DOMContentLoaded", function () {
+  const registerForm = document.getElementById("registerForm");
+  const loginForm = document.getElementById("loginForm");
 
-    registerForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        if (validateForm()) {
-            alert('Registration successful!');
-            registerForm.reset();
-        }
-
+  if (registerForm) {
+    registerForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (validateRegistrationForm()) {
+        window.location.href = "journal.html";
+      }
     });
+  }
 
-    loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        if (validateForm()) {
-            alert('Login successful!');
-            loginForm.reset();
-        }
-
+  if (loginForm) {
+    loginForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (validateLoginForm()) {
+        window.location.href = "journal.html";
+      }
     });
+  }
 
-    
+  function validateRegistrationForm() {
+    const firstNameInput = document.getElementById("firstName");
+    const lastNameInput = document.getElementById("lastName");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const confirmPasswordInput = document.getElementById("confirmPassword");
+    const firstNameError = document.getElementById("firstNameError");
+    const emailError = document.getElementById("emailError");
+    const passwordError = document.getElementById("passwordError");
+    const confirmPasswordError = document.getElementById(
+      "confirmPasswordError"
+    );
 
-    function validateForm() {
-        let isValid = true;
+    let isValid = true;
 
-        if (firstNameInput.value.trim() === '' ) {
-            firstNameError.textContent = 'First name is required.';
-            isValid = false;
-        } else {
-            firstNameError.textContent = '';
-        }
-
-        if (!validateEmail(emailInput.value)) {
-            emailError.textContent = 'Please enter a valid email address. ';
-            isValid = false;
-        } else {
-            emailError.textContent = '';
-        }
-
-        if (!validatePassword(passwordInput.value)) {
-            passwordError.textContent = 'Password must be at least 8 characters long, conatin at leat one uppercase letter, three digit, and one special character.';
-            isValid = false;
-        } else {
-            passwordError.textCont = '';
-        }
-
-        if (passwordInput.value !== confirmPasswordInput.value) {
-            confirmPasswordError.textContent = 'Passwords do not match.';
-            isValid = false;
-        } else {
-            confirmPasswordError.textContent = '';
-        }
-        return isValid;
+    if (firstNameInput.value.trim() === "") {
+      firstNameError.textContent = "First name is required.";
+      isValid = false;
+    } else {
+      firstNameError.textContent = "";
     }
 
-    function validateEmail(email) {
-        const re = /^[^\s@] +@[^\s@]+\.[^\s@]+$/;
-        return re.test(String(email).toLowerCase());
+    if (!validateEmail(emailInput.value)) {
+      emailError.textContent = "Please enter a valid email address.";
+      isValid = false;
+    } else {
+      emailError.textContent = "";
     }
 
-    function validatePassword(password) {
-        const re = /^(?=.*[A-Z])(?=.*\d.*\d.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
-        return re.test(password);
+    if (!validatePassword(passwordInput.value)) {
+      passwordError.textContent =
+        "Password must be at least 8 characters long, contain at least one uppercase letter, three digits, and one special character.";
+      isValid = false;
+    } else {
+      passwordError.textContent = "";
     }
 
+    if (passwordInput.value !== confirmPasswordInput.value) {
+      confirmPasswordError.textContent = "Passwords do not match.";
+      isValid = false;
+    } else {
+      confirmPasswordError.textContent = "";
+    }
+
+    return isValid;
+  }
+
+  function validateLoginForm() {
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+    const usernameError = document.getElementById("usernameError");
+    const passwordError = document.getElementById("passwordError");
+
+    let isValid = true;
+
+    if (usernameInput.value.trim() === "") {
+      usernameError.textContent = "Username is required.";
+      isValid = false;
+    } else {
+      usernameError.textContent = "";
+    }
+
+    if (!validatePassword(passwordInput.value)) {
+      passwordError.textContent = "Invalid password.";
+      isValid = false;
+    } else {
+      passwordError.textContent = "";
+    }
+
+    return isValid;
+  }
+
+  function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  }
+
+  function validatePassword(password) {
+    const re =
+      /^(?=.*[A-Z])(?=.*\d.*\d.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    return re.test(password);
+  }
 });
