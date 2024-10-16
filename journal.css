@@ -1,0 +1,172 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #000;
+  color: #fff;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 200px;
+  padding: 20px;
+  background-color: #000;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  justify-content: space-between;
+}
+
+.sidebar-top,
+.sidebar-middle,
+.sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sidebar-middle {
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.logo {
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  color: #fff;
+  text-decoration: none;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.menu-item:hover,
+.menu-item.active {
+  opacity: 1;
+}
+
+.menu-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 15px;
+}
+
+.profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.profile-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.profile-name {
+  font-size: 14px;
+  text-align: center;
+  color: #fff;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+  margin-left: 240px;
+  overflow-y: auto;
+}
+
+.entry-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.entry-card {
+  background-color: #111;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  height: 200px;
+}
+
+.entry-image {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.entry-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  padding: 15px;
+  color: #fff;
+}
+
+.entry-title {
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.entry-date {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+@media (max-width: 1080px) {
+  .entry-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px;
+    padding: 20px 10px;
+  }
+
+  .logo {
+    font-size: 18px;
+  }
+
+  .menu-item span {
+    display: none;
+  }
+
+  .profile-name {
+    display: none;
+  }
+
+  .main-content {
+    margin-left: 80px;
+  }
+
+  .entry-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Memoire</title>
+    <link rel="stylesheet" href="index.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <aside class="sidebar">
+        <div class="sidebar-top">
+          <h1 class="logo">Memoire</h1>
+        </div>
+        <nav class="sidebar-middle">
+          <a href="#" class="menu-item active">
+            <img src="/api/placeholder/24/24" alt="Journal" class="menu-icon" />
+            <span>Journal</span>
+          </a>
+          <a href="#" class="menu-item">
+            <img src="/api/placeholder/24/24" alt="My Mood" class="menu-icon" />
+            <span>My Mood</span>
+          </a>
+          <a href="#" class="menu-item">
+            <img src="/api/placeholder/24/24" alt="Reflect" class="menu-icon" />
+            <span>Reflect</span>
+          </a>
+          <a href="#" class="menu-item">
+            <img
+              src="/api/placeholder/24/24"
+              alt="Gratitude"
+              class="menu-icon"
+            />
+            <span>Gratitude</span>
+          </a>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="profile">
+            <img
+              src="/api/placeholder/40/40"
+              alt="Profile"
+              class="profile-image"
+            />
+            <span class="profile-name">Maya Adjei</span>
+          </div>
+        </div>
+      </aside>
+      <main class="main-content">
+        <div class="entry-grid" id="entryGrid">
+          <!-- Entry cards will be dynamically added here -->
+        </div>
+      </main>
+    </div>
+    <script src="index.js"></script>
+  </body>
+</html>
