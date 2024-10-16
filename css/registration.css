@@ -5,19 +5,25 @@ body{
     font-family: Arial, sans-serif;
     min-height: 100vh;
     flex-direction: column;
-    
-
-
+    background-color:#121212;   
 }
 
-.main{
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 15px;
-    box-shadow: 0 0 20px rgba(60, 60, 60, 0.2);
+.main {
+   
     padding: 10px 20px;
     width: 500px;
     text-align: center;
+    color: white; /* Text color changed to white for better readability */
+    /*backdrop-filter: blur(20px); /* Increased blur effect for a more pronounced glass look */
+    background: linear-gradient(135deg,rgba(255,255,255,0.1), rgba(255,255,255,0));
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(30px);
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,018);
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37);
 }
+
+
 
 label{
     display: block;
@@ -25,7 +31,7 @@ label{
     margin-top: 10px;
     margin-bottom: 10px;
     text-align: left;
-    color: #181818;
+    color: white;
     font-weight: bold;
 }
 
@@ -64,7 +70,7 @@ button:hover{
 }
 
 h1{
-    color: rgb(36, 36, 36);
+    color: white;
 }
 
 .wrap-button{
@@ -77,14 +83,21 @@ h1{
     text-align: center;
     font-size: 15px;
     margin-top: 25px;
+    color:white;
 }
 
-@media screen and (max-width: 600px){
-    .main{
-        width: 80%;
-    }
-
-    .Signup-box{
-        width: 80%;
-    }
+.error {
+    color: red;
+    font-size: 14px;
 }
+
+a {
+    color: rgb(221, 178, 78);
+}
+
+
+
+
+
+
+
