@@ -180,14 +180,3 @@ Here's what's coming next:
 ## ✨ Special Thanks
 
 A huge thank you to everyone on the team making this possible.
-
-## 📄 License
-
-Memoire is a school project maintained by 4 students
-
----
-
-Made with ❤️ by the Memoire Team
-
-Remember, **your story matters**. Start documenting it today with Memoire.
-
