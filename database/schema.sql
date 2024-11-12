@@ -1,107 +1,90 @@
--- Creates the database if it does not exist
-CREATE DATABASE IF NOT EXISTS memoire_db;
-USE memoire_db;
+-- Create database with proper character encoding
+CREATE DATABASE IF NOT EXISTS memoire;
+USE memoire;
 
--- Users table
+-- Users table - Core user information (INITIALIZATION COMPLETE)
 CREATE TABLE Users (
-	user_id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(50) NOT NULL UNIQUE,
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    firstName VARCHAR(50) NOT NULL,
+    lastName VARCHAR(50) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
+    passwd VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    last_login TIMESTAMP NULL
+    updated_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    last_login TIMESTAMP NULL,
+    profile_image VARCHAR(255) DEFAULT NULL
+    INDEX idx_email (email)
 );
 
--- Journal Entries table
+-- Journal Entries Table
 CREATE TABLE JournalEntries (
-	entry_id INT PRIMARY KEY AUTO_INCREMENT,
+    entry_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
-    title VARCHAR(255) NOT NULL,
+    title VARCHAR(255),
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    is_private BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
-);
-
--- Moods table
-CREATE TABLE Moods (
-	mood_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    mood_rating INT NOT NULL CHECK (mood_rating BETWEEN 1 AND 5),
-    mood_description VARCHAR(100),
-    recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
-);
-
--- Gratitude Entries table
-CREATE TABLE GratitudeEntries (
-	gratitude_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    content TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
-);
-
--- Reflection Prompts table
-CREATE TABLE ReflectionPrompts (
-	prompt_id INT PRIMARY KEY AUTO_INCREMENT,
-    prompt_text TEXT NOT NULL,
-    category VARCHAR(50),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Reflections table
-CREATE TABLE Reflections (
-	reflection_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    prompt_id INT NOT NULL,
-    content TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (prompt_id) REFERENCES ReflectionPrompts(prompt_id)
+    INDEX idx_user_date (user_id, created_at DESC)
 );
 
--- Media Attachments table
-CREATE TABLE MediaAttachments (
-	media_id INT PRIMARY KEY AUTO_INCREMENT,
+-- Media Attachments Table
+CREATE TABLE EntryMedia (
+    media_id INT PRIMARY KEY AUTO_INCREMENT,
     entry_id INT NOT NULL,
     file_path VARCHAR(255) NOT NULL,
-    file_type VARCHAR(50) NOT NULL,
-    file_size INT NOT NULL,
-    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (entry_id) REFERENCES JournalEntries(entry_id) ON DELETE CASCADE
+    media_type VARCHAR(50) NOT NULL,  -- 'image', 'video', etc.
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (entry_id) REFERENCES JournalEntries(entry_id) ON DELETE CASCADE,
+    INDEX idx_entry_media (entry_id)
+);
+
+-- Collections table
+CREATE TABLE Collections (
+    collection_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_collection_name_per_user (user_id, name),
+    INDEX idx_user_collections (user_id)
 );
 
 -- Tags table
-CREATE TABLE TAGS (
-	tag_id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL UNIQUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE Tags (
+    tag_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_tag_name_per_user (user_id, name),
+    INDEX idx_user_tags (user_id)
 );
 
--- Entry Tags junction table
+-- Entry-Collection relationship table
+CREATE TABLE EntryCollections (
+    entry_id INT NOT NULL,
+    collection_id INT NOT NULL,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (entry_id, collection_id),
+    FOREIGN KEY (entry_id) REFERENCES JournalEntries(entry_id) ON DELETE CASCADE,
+    FOREIGN KEY (collection_id) REFERENCES Collections(collection_id) ON DELETE CASCADE,
+    INDEX idx_collection_entries (collection_id, entry_id)
+);
+
+-- Entry-Tag relationship table
 CREATE TABLE EntryTags (
-	entry_id INT NOT NULL,
+    entry_id INT NOT NULL,
     tag_id INT NOT NULL,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (entry_id, tag_id),
     FOREIGN KEY (entry_id) REFERENCES JournalEntries(entry_id) ON DELETE CASCADE,
-    FOREIGN KEY (tag_id) REFERENCES Tags(tag_id) ON DELETE CASCADE
+    FOREIGN KEY (tag_id) REFERENCES Tags(tag_id) ON DELETE CASCADE,
+    INDEX idx_tag_entries (tag_id, entry_id)
 );
 
--- User Preferences table
-CREATE TABLE UserPreferences (
-	user_id INT PRIMARY KEY,
-    theme VARCHAR(20) DEFAULT 'light',
-    email_notifications BOOLEAN DEFAULT TRUE,
-    privacy_level VARCHAR(20) DEFAULT 'private',
-    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
-);
-
--- Indexes for better query performance
-CREATE INDEX idx_journal_user ON JournalEntries(user_id);
-CREATE INDEX idx_moods_user ON Moods(user_id);
-CREATE INDEX idx_gratitude_user ON GratitudeEntries(user_id);
-CREATE INDEX idx_reflections_user ON Reflections(user_id);
-CREATE INDEX idx_media_entry ON MediaAttachments(entry_id);
+-- Add full-text search index to JournalEntries
+ALTER TABLE JournalEntries 
+ADD FULLTEXT INDEX ft_entry_content (title, content);
