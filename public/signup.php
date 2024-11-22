@@ -1,8 +1,8 @@
 <?php
-require_once "../includes/session_protection.inc.php";
+require_once "../includes/security/session_protection.inc.php";
+require_once "../config/config_session.inc.php";
+require_once "../includes/auth/signup/signup_view.inc.php";
 prevent_login_access();
-require_once "../includes/config_session.inc.php";
-require_once "../includes/signup/signup_view.inc.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -33,7 +33,7 @@ require_once "../includes/signup/signup_view.inc.php";
                 $email = isset($_SESSION["signup_data"]["email"]) ? $_SESSION["signup_data"]["email"] : "";
                 ?>
 
-                <form class="signup-form" method="POST" action="../includes/signup/signup.inc.php">
+                <form class="signup-form" method="POST" action="../includes/auth/signup/signup.inc.php">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="firstName">First Name</label>

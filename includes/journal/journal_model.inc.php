@@ -57,26 +57,45 @@ function delete_journal_entry(object $pdo, int $entry_id, int $user_id) {
         ]);
         $file_path = $stmt->fetchColumn();
 
+        // Log the retrieved file path
+        error_log("Retrieved file path for deletion: " . $file_path);
+
         // Delete the entry (cascade will handle EntryMedia)
         $query = "DELETE FROM JournalEntries 
                  WHERE entry_id = :entry_id AND user_id = :user_id";
         $stmt = $pdo->prepare($query);
-        $stmt->execute([
+        $result = $stmt->execute([
             ":entry_id" => $entry_id,
             ":user_id" => $user_id
         ]);
 
-        // If deletion was successful and file exists, delete the image
-        if ($stmt->rowCount() > 0 && $file_path && file_exists($file_path)) {
-            unlink($file_path);
+        if ($result && $file_path) {
+            // Clean up the file path (remove leading '../' if present)
+            $file_path = preg_replace('/^\.\.\//', '', $file_path);
+            $full_file_path = __DIR__ . "/../../" . $file_path;
+            
+            error_log("Attempting to delete file: " . $full_file_path);
+            
+            if (file_exists($full_file_path)) {
+                if (!unlink($full_file_path)) {
+                    error_log("Failed to delete file: " . $full_file_path);
+                } else {
+                    error_log("Successfully deleted file: " . $full_file_path);
+                }
+            } else {
+                error_log("File does not exist: " . $full_file_path);
+            }
         }
 
         // Commit transaction
         $pdo->commit();
         return true;
+        
     } catch (PDOException $e) {
         // Rollback on error
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         error_log("Error deleting journal entry: " . $e->getMessage());
         return false;
     }
@@ -168,5 +187,41 @@ function get_more_entries(object $pdo, int $user_id, int $current_entry_id, int 
     } catch (PDOException $e) {
         error_log("Error fetching more entries: " . $e->getMessage());
         return [];
+    }
+}
+
+function create_journal_entry(object $pdo, int $user_id, string $title, string $content): int {
+    try {
+        $query = "INSERT INTO JournalEntries (user_id, title, content) VALUES (:user_id, :title, :content)";
+        $stmt = $pdo->prepare($query);
+        
+        if (!$stmt->execute([
+            ":user_id" => $user_id,
+            ":title" => $title,
+            ":content" => $content
+        ])) {
+            throw new Exception("Failed to insert journal entry");
+        }
+
+        return (int)$pdo->lastInsertId();
+    } catch (PDOException $e) {
+        error_log("Error creating journal entry: " . $e->getMessage());
+        throw $e;
+    }
+}
+
+function create_media_entry(object $pdo, int $entry_id, string $file_path, string $media_type): bool {
+    try {
+        $query = "INSERT INTO EntryMedia (entry_id, file_path, media_type) VALUES (:entry_id, :file_path, :media_type)";
+        $stmt = $pdo->prepare($query);
+        
+        return $stmt->execute([
+            ":entry_id" => $entry_id,
+            ":file_path" => $file_path,
+            ":media_type" => $media_type
+        ]);
+    } catch (PDOException $e) {
+        error_log("Error creating media entry: " . $e->getMessage());
+        throw $e;
     }
 }

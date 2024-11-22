@@ -8,9 +8,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     try {
 
         // Required files
-        require_once "dbh.inc.php";
+        require_once "../../config/dbh.inc.php";
         require_once "settings_model.inc.php";
-        require_once "config_session.inc.php";
+        require_once "../../config/config_session.inc.php";
 
         // Verify confirmation text
         if ($confirmDelete !== "DELETE") {
@@ -26,20 +26,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Start new session for message
             session_start();
             $_SESSION["signup_success"] = "Your account has been successfully deleted.";
-            header("Location: ../public/login.php");
+            header("Location: ../../public/login.php");
         } else {
             $_SESSION["settings_error"] = "Failed to delete account. Please try again.";
-            header("Location: ../pages/settings.php");
+            header("Location: ../../pages/settings.php");
         }
         die();
 
     } catch (Exception $e) {
         $_SESSION["settings_error"] = "An error occurred. Please try again later.";
         error_log("Error deleting account: " . $e->getMessage());
-        header("Location: ../pages/settings.php");
+        header("Location: ../../pages/settings.php");
         die();
     }
 } else {
-    header("Location: ../pages/settings.php");
+    header("Location: ../../public/login.php");
     die();
 }

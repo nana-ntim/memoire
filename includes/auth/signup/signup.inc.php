@@ -8,9 +8,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $confirm_pwd = $_POST["confirmPassword"];
 
     try {
-        require_once "../dbh.inc.php";
-        require_once 'signup_model.inc.php';
-        require_once 'signup_contr.inc.php';
+        require_once "../../../config/dbh.inc.php";
+        require_once "../../../config/config_session.inc.php";
+        require_once "./signup_model.inc.php";
+        require_once "./signup_contr.inc.php";
 
         // ERROR HANDLERS
         $errors = [];
@@ -35,8 +36,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $errors["password_length"] = "Password must be at least 8 characters long";
         }
 
-        require_once '../config_session.inc.php';
-
         if($errors) {
             $_SESSION["errors_signup"] = $errors;
 
@@ -47,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             ];
 
             $_SESSION["signup_data"] = $signupData;
-            header("Location: ../../public/signup.php");
+            header("Location: ../../../public/signup.php");
             die();
         }
 
@@ -55,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Set success message and redirect to login page
         $_SESSION["signup_success"] = "Account created successfully! Please log in.";
-        header("Location: ../../public/login.php");
+        header("Location: ../../../public/login.php");
 
         $pdo = null;
         $stmt = null;
@@ -67,10 +66,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         // Show a user-friendly error message
         $_SESSION["errors_signup"] = ["database_error" => "An error occurred. Please try again later."];
-        header("Location: ../../public/signup.php");
+        header("Location: ../../../public/signup.php");
         die();
     }
 } else {
-    header("Location: ../../public/signup.php");
+    header("Location: ../../../public/signup.php");
     die();
 }

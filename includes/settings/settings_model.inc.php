@@ -85,25 +85,89 @@ function delete_user_account(object $pdo, int $user_id) {
     try {
         // Start transaction
         $pdo->beginTransaction();
-        
-        // Delete user's journal entries (cascade will handle EntryMedia)
+
+        // First, get all image paths that need to be deleted
+        // Get profile image
+        $query = "SELECT profile_image FROM Users WHERE user_id = :user_id";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([":user_id" => $user_id]);
+        $profile_image = $stmt->fetchColumn();
+
+        // Get all journal entry images
+        $query = "SELECT m.file_path 
+                 FROM EntryMedia m 
+                 JOIN JournalEntries e ON m.entry_id = e.entry_id 
+                 WHERE e.user_id = :user_id";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([":user_id" => $user_id]);
+        $journal_images = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        // Delete user's journal entries (cascade will handle EntryMedia and CollectionEntries)
         $query = "DELETE FROM JournalEntries WHERE user_id = :user_id";
         $stmt = $pdo->prepare($query);
-        $stmt->bindParam(":user_id", $user_id);
-        $stmt->execute();
+        $stmt->execute([":user_id" => $user_id]);
+
+        // Delete user's collections (cascade will handle CollectionEntries)
+        $query = "DELETE FROM Collections WHERE user_id = :user_id";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([":user_id" => $user_id]);
         
         // Delete the user
         $query = "DELETE FROM Users WHERE user_id = :user_id";
         $stmt = $pdo->prepare($query);
-        $stmt->bindParam(":user_id", $user_id);
-        $stmt->execute();
+        $stmt->execute([":user_id" => $user_id]);
         
+        // After successful database deletion, delete all associated files
+        $deleted_files = [];
+        $failed_files = [];
+
+        // Delete profile image if it exists and is not the default
+        if ($profile_image && $profile_image !== 'assets/default-avatar.jpg') {
+            $profile_image = preg_replace('/^\.\.\//', '', $profile_image);
+            $full_path = __DIR__ . "/../../" . $profile_image;
+            
+            if (file_exists($full_path)) {
+                if (unlink($full_path)) {
+                    $deleted_files[] = $full_path;
+                } else {
+                    $failed_files[] = $full_path;
+                }
+            }
+        }
+
+        // Delete all journal entry images
+        foreach ($journal_images as $image_path) {
+            if ($image_path) {
+                $image_path = preg_replace('/^\.\.\//', '', $image_path);
+                $full_path = __DIR__ . "/../../" . $image_path;
+                
+                if (file_exists($full_path)) {
+                    if (unlink($full_path)) {
+                        $deleted_files[] = $full_path;
+                    } else {
+                        $failed_files[] = $full_path;
+                    }
+                }
+            }
+        }
+
+        // Log the results
+        if (!empty($deleted_files)) {
+            error_log("Successfully deleted files for user $user_id: " . implode(", ", $deleted_files));
+        }
+        if (!empty($failed_files)) {
+            error_log("Failed to delete files for user $user_id: " . implode(", ", $failed_files));
+        }
+
         // Commit transaction
         $pdo->commit();
         return true;
+
     } catch (PDOException $e) {
         // Rollback on error
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         error_log("Error deleting user account: " . $e->getMessage());
         return false;
     }

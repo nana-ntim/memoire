@@ -10,7 +10,7 @@ $stmt->execute();
 $profile_image = $stmt->fetch(PDO::FETCH_ASSOC)['profile_image'];
 
 // Set default image if none exists
-$profile_image_path = !empty($profile_image) ? "../" . $profile_image : "../assets/default-avatar.jpg";
+$profile_image_path = !empty($profile_image) ? "../" . $profile_image : "../assets/bg.jpg";
 ?>
 
 <nav class="navbar">
@@ -19,6 +19,7 @@ $profile_image_path = !empty($profile_image) ? "../" . $profile_image : "../asse
         
         <div class="nav-center">
             <a href="../pages/journal.php" class="nav-link <?php echo ($current_page === 'journal.php') ? 'active' : ''; ?>">Journal</a>
+            <a href="../pages/collections.php" class="nav-link <?php echo ($current_page === 'collections.php') ? 'active' : ''; ?>">Collections</a>
             <a href="../pages/reflect.php" class="nav-link <?php echo ($current_page === 'reflect.php') ? 'active' : ''; ?>">Reflect</a>
             <a href="../pages/gratitude.php" class="nav-link <?php echo ($current_page === 'gratitude.php') ? 'active' : ''; ?>">Gratitude</a>
         </div>
@@ -36,7 +37,7 @@ $profile_image_path = !empty($profile_image) ? "../" . $profile_image : "../asse
                         Settings
                     </a>
                     <div class="dropdown-divider"></div>
-                    <a href="../includes/logout.inc.php" class="dropdown-item">
+                    <a href="../includes/auth/logout.inc.php" class="dropdown-item">
                         <i class="fas fa-sign-out-alt"></i>
                         Logout
                     </a>
@@ -55,6 +56,7 @@ $profile_image_path = !empty($profile_image) ? "../" . $profile_image : "../asse
 <!-- Mobile menu -->
 <div class="mobile-menu" id="mobileMenu">
     <a href="../pages/journal.php" class="mobile-link <?php echo ($current_page === 'journal.php') ? 'active' : ''; ?>">Journal</a>
+    <a href="../pages/collections.php" class="mobile-link <?php echo ($current_page === 'collections.php') ? 'active' : ''; ?>">Collections</a>
     <a href="../pages/reflect.php" class="mobile-link <?php echo ($current_page === 'reflect.php') ? 'active' : ''; ?>">Reflect</a>
     <a href="../pages/gratitude.php" class="mobile-link <?php echo ($current_page === 'gratitude.php') ? 'active' : ''; ?>">Gratitude</a>
     

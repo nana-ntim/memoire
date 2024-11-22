@@ -16,7 +16,7 @@ CREATE TABLE Users (
     INDEX idx_email (email)
 );
 
--- Journal Entries Table
+-- Journal Entries Table (INITIALIZATION COMPLETE)
 CREATE TABLE JournalEntries (
     entry_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE JournalEntries (
     INDEX idx_user_date (user_id, created_at DESC)
 );
 
--- Media Attachments Table
+-- Media Attachments Table (INITIALIZATION COMPLETE)
 CREATE TABLE EntryMedia (
     media_id INT PRIMARY KEY AUTO_INCREMENT,
     entry_id INT NOT NULL,
@@ -39,11 +39,11 @@ CREATE TABLE EntryMedia (
     INDEX idx_entry_media (entry_id)
 );
 
--- Collections table
+-- Collections table (INITIALIZATION COMPLETE)
 CREATE TABLE Collections (
     collection_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(255) NOT NULL,
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -52,37 +52,14 @@ CREATE TABLE Collections (
     INDEX idx_user_collections (user_id)
 );
 
--- Tags table
-CREATE TABLE Tags (
-    tag_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    name VARCHAR(50) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
-    UNIQUE KEY unique_tag_name_per_user (user_id, name),
-    INDEX idx_user_tags (user_id)
-);
-
--- Entry-Collection relationship table
-CREATE TABLE EntryCollections (
-    entry_id INT NOT NULL,
+-- Collection Entries junction table (INITIALIZATION COMPLETE)
+CREATE TABLE CollectionEntries (
     collection_id INT NOT NULL,
-    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (entry_id, collection_id),
-    FOREIGN KEY (entry_id) REFERENCES JournalEntries(entry_id) ON DELETE CASCADE,
-    FOREIGN KEY (collection_id) REFERENCES Collections(collection_id) ON DELETE CASCADE,
-    INDEX idx_collection_entries (collection_id, entry_id)
-);
-
--- Entry-Tag relationship table
-CREATE TABLE EntryTags (
     entry_id INT NOT NULL,
-    tag_id INT NOT NULL,
     added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (entry_id, tag_id),
-    FOREIGN KEY (entry_id) REFERENCES JournalEntries(entry_id) ON DELETE CASCADE,
-    FOREIGN KEY (tag_id) REFERENCES Tags(tag_id) ON DELETE CASCADE,
-    INDEX idx_tag_entries (tag_id, entry_id)
+    PRIMARY KEY (collection_id, entry_id),
+    FOREIGN KEY (collection_id) REFERENCES Collections(collection_id) ON DELETE CASCADE,
+    FOREIGN KEY (entry_id) REFERENCES JournalEntries(entry_id) ON DELETE CASCADE
 );
 
 -- Add full-text search index to JournalEntries

@@ -1,12 +1,16 @@
 <?php
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     try {
-        require_once "dbh.inc.php";
-        require_once "config_session.inc.php";
+        require_once "../../config/dbh.inc.php";
+        require_once "../../config/config_session.inc.php";
 
         // Define upload directory
-        $upload_dir = __DIR__ . "/../uploads/profiles/";
+        $upload_dir = __DIR__ . "/../../uploads/profiles/";
+
+        // Create directory if it doesn't exist
+        if (!file_exists($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
 
         // Validate the uploaded file
         if (!isset($_FILES["profile_image"]) || $_FILES["profile_image"]["error"] !== UPLOAD_ERR_OK) {
@@ -61,11 +65,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 throw new Exception("Failed to update profile image reference.");
             }
 
-            // Delete old profile image
+            // Delete old profile image if it exists and is not the default image
             if ($old_image && $old_image !== 'assets/default-avatar.jpg') {
-                $old_file_path = __DIR__ . "/../" . $old_image;
+                $old_file_path = __DIR__ . "/../../" . $old_image;
                 if (file_exists($old_file_path) && is_file($old_file_path)) {
-                    unlink($old_file_path);
+                    if (!unlink($old_file_path)) {
+                        error_log("Failed to delete old profile image: " . $old_file_path);
+                    }
                 }
             }
 
@@ -83,35 +89,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             throw $e;
         }
 
-        header("Location: ../pages/settings.php");
+        header("Location: ../../pages/settings.php");
         die();
 
     } catch (Exception $e) {
         error_log("Profile image update error: " . $e->getMessage());
         $_SESSION["settings_error"] = "Failed to update profile picture: " . $e->getMessage();
-        header("Location: ../pages/settings.php");
+        header("Location: ../../pages/settings.php");
         die();
     }
 } else {
-    header("Location: ../pages/settings.php");
+    header("Location: ../../pages/settings.php");
     die();
 }
 
 function getUploadErrorMessage($code) {
-    switch ($code) {
-        case UPLOAD_ERR_INI_SIZE:
-            return "The uploaded file exceeds the server's maximum file size limit.";
-        case UPLOAD_ERR_FORM_SIZE:
-            return "The uploaded file is too large.";
-        case UPLOAD_ERR_PARTIAL:
-            return "The file was only partially uploaded. Please try again.";
-        case UPLOAD_ERR_NO_FILE:
-            return "No file was selected. Please choose an image.";
-        case UPLOAD_ERR_NO_TMP_DIR:
-        case UPLOAD_ERR_CANT_WRITE:
-        case UPLOAD_ERR_EXTENSION:
-            return "Server configuration error. Please contact support.";
-        default:
-            return "An unknown error occurred. Please try again.";
-    }
+    return match ($code) {
+        UPLOAD_ERR_INI_SIZE => "The uploaded file exceeds the server's maximum file size limit.",
+        UPLOAD_ERR_FORM_SIZE => "The uploaded file is too large.",
+        UPLOAD_ERR_PARTIAL => "The file was only partially uploaded. Please try again.",
+        UPLOAD_ERR_NO_FILE => "No file was selected. Please choose an image.",
+        UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_CANT_WRITE, UPLOAD_ERR_EXTENSION => "Server configuration error. Please contact support.",
+        default => "An unknown error occurred. Please try again."
+    };
 }

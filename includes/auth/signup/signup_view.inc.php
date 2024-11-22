@@ -4,9 +4,6 @@
 // of information
 
 declare(strict_types = 1);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
 function check_signup_errors() {
     if(isset($_SESSION['errors_signup'])) {

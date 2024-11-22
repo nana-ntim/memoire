@@ -1,14 +1,13 @@
 <?php
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     try {
-        // Include required files and start session
-        require_once "dbh.inc.php";
+        require_once "../../config/dbh.inc.php";
         require_once "journal_model.inc.php";
-        require_once "config_session.inc.php";
-
+        require_once "../../config/config_session.inc.php";
+        
         // Basic security check - ensure user is logged in
         if (!isset($_SESSION["user_id"])) {
-            header("Location: ../public/login.php");
+            header("Location: ../../public/login.php");
             die();
         }
 
@@ -49,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // Redirect back to the entry page
-        header("Location: ../pages/entry.php?id=" . $entry_id);
+        header("Location: ../../pages/entry.php?id=" . $entry_id);
         die();
 
     } catch (Exception $e) {
@@ -58,11 +57,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION["entry_error"] = $e->getMessage();
         
         // Redirect back to entry page
-        header("Location: ../pages/entry.php?id=" . ($entry_id ?? ''));
+        header("Location: ../../pages/entry.php?id=" . ($entry_id ?? ''));
         die();
     }
 } else {
     // If not POST request, redirect to journal page
-    header("Location: ../pages/journal.php");
+    header("Location: ../../pages/journal.php");
     die();
 }

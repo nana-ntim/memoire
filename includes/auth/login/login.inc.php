@@ -5,9 +5,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $pwd = $_POST["password"];
 
     try {
-        require_once "../dbh.inc.php";
-        require_once 'login_model.inc.php';
-        require_once 'login_contr.inc.php';
+        require_once "../../../config/dbh.inc.php";
+        require_once "../../../config/config_session.inc.php";
+        require_once "login_model.inc.php";
+        require_once "login_contr.inc.php";
 
         // ERROR HANDLERS
         $errors = [];
@@ -25,11 +26,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $errors["login_incorrect"] = "Incorrect login info!";
         }
 
-        require_once '../config_session.inc.php';
-
         if($errors) {
             $_SESSION["errors_login"] = $errors;
-            header("Location: ../../public/login.php");
+            header("Location: ../../../public/login.php");
             die();
         }
 
@@ -42,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION["user_email"] = $result["email"];
         $_SESSION["last_regeneration"] = time();
 
-        header("Location: ../../pages/journal.php");
+        header("Location: ../../../pages/journal.php");
         $pdo = null;
         $stmt = null;
         die();
@@ -51,6 +50,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Query failed: " . $e->getMessage());
     }
 } else {
-    header("Location: ../../public/login.php");
+    header("Location: ../../../public/login.php");
     die();
 }
