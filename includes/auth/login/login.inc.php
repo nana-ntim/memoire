@@ -1,4 +1,5 @@
 <?php
+// File: includes/auth/login.inc.php
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST["email"];
@@ -40,8 +41,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION["user_id"] = $result["user_id"];
         $_SESSION["user_email"] = $result["email"];
         $_SESSION["last_regeneration"] = time();
+        $_SESSION["is_admin"] = $result["is_admin"] ?? false;
 
+        // Update the last_login timestamp
+        $query = "UPDATE Users SET last_login = NOW() WHERE user_id = :user_id";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(":user_id", $result["user_id"]);
+        $stmt->execute();
+
+        // Redirect based on user type - always to journal first
         header("Location: ../../../pages/journal.php");
+        
         $pdo = null;
         $stmt = null;
         die();

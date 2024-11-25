@@ -322,3 +322,26 @@ body {
         opacity: 1;
     }
 }
+
+
+/* Admin-specific additions */
+.nav-link i {
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+.mobile-link i {
+    margin-right: 12px;
+    font-size: 16px;
+}
+
+/* Exit admin styling */
+.dropdown-item i.fa-arrow-left,
+.mobile-profile-link i.fa-arrow-left {
+    color: #ef4444;
+}
+
+.dropdown-item:hover i.fa-arrow-left,
+.mobile-profile-link:hover i.fa-arrow-left {
+    color: #dc2626;
+}

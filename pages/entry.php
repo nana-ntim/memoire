@@ -321,5 +321,6 @@ unset($_SESSION["entry_success"], $_SESSION["entry_error"]);
             }
         }
     </script>
+    <script src="../js/admin/navbar.js"></script>
 </body>
 </html>

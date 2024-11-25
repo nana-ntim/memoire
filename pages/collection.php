@@ -352,5 +352,6 @@ unset($_SESSION["collection_success"], $_SESSION["collection_error"]);
             };
         </script>
     </main>
+    <script src="../js/admin/navbar.js"></script>
 </body>
 </html>

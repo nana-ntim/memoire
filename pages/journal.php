@@ -5,6 +5,8 @@ require_once "../config/dbh.inc.php";
 require_once "../includes/journal/journal_model.inc.php";
 force_login();
 
+ini_set('display_errors', 1);
+
 // Get success/error messages from session
 $successMessage = $_SESSION["entry_success"] ?? "";
 $errorMessage = $_SESSION["entry_error"] ?? "";
@@ -417,5 +419,6 @@ $entries = get_journal_entries($pdo, $_SESSION["user_id"]);
             }
         });
     </script>
+    <script src="../js/admin/navbar.js"></script>
 </body>
 </html>

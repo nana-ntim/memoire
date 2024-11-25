@@ -52,7 +52,7 @@ unset($_SESSION["settings_error"]);
                             if (!empty($user_data['profile_image'])) {
                                 echo htmlspecialchars('../' . $user_data['profile_image']);
                             } else {
-                                echo '../assets/default-avatar.jpg';
+                                echo '../assets/bg.jpg';
                             }
                         ?>" 
                             alt="Profile" 

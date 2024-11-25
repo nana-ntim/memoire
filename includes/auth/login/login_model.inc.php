@@ -1,4 +1,6 @@
 <?php
+// File: includes/auth/login/login_model.inc.php
+
 declare(strict_types = 1);
 
 function get_user(object $pdo, string $email) {
@@ -7,8 +9,7 @@ function get_user(object $pdo, string $email) {
     $stmt->bindParam(":email", $email);
     $stmt->execute();
 
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    return $result;
+    return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 function update_login_timestamp(object $pdo, int $userId) {
@@ -16,4 +17,13 @@ function update_login_timestamp(object $pdo, int $userId) {
     $stmt = $pdo->prepare($query);
     $stmt->bindParam(":userId", $userId);
     $stmt->execute();
+}
+
+function is_user_admin(object $pdo, int $userId) {
+    $query = "SELECT is_admin FROM Users WHERE user_id = :userId;";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(":userId", $userId);
+    $stmt->execute();
+    
+    return (bool)$stmt->fetchColumn();
 }
