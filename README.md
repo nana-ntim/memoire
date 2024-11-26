@@ -6,8 +6,8 @@ Memoire is a web-based journaling application that allows users to document thei
 ## Team Members
 - Nana Ntim
 - Sinam Ametewee
-- PraiseGod
-- Naa
+- PraiseGod Osiagor
+- Naa Lamiokor Dove
 
 ## Features
 - **Journal Entries**: Create and manage personal journal entries with images
