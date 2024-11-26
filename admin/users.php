@@ -135,11 +135,11 @@ $stats = get_user_statistics($pdo);
                         </div>
 
                         <div class="user-actions">
-                            <button onclick="viewUser(<?php echo $user['user_id']; ?>)" class="btn-view">
+                            <button onclick="viewUserDetails(<?php echo $user['user_id']; ?>)" class="btn-view">
                                 <i class="fas fa-eye"></i>
                                 View Details
                             </button>
-                            <button onclick="deleteUser(<?php echo $user['user_id']; ?>)" class="btn-delete">
+                            <button onclick="deleteUserConfirm(<?php echo $user['user_id']; ?>, '<?php echo htmlspecialchars(addslashes($user['firstName'] . ' ' . $user['lastName'])); ?>')" class="btn-delete">
                                 <i class="fas fa-trash"></i>
                                 Delete
                             </button>
@@ -178,6 +178,71 @@ $stats = get_user_statistics($pdo);
         </div>
     </div>
 
+    <!-- Hidden Delete Form -->
+    <form id="deleteForm" action="../includes/admin/user_operations.inc.php" method="POST" style="display: none;">
+        <input type="hidden" name="action" value="delete">
+        <input type="hidden" name="user_id" id="deleteUserId">
+    </form>
+
+    <script>
+        // URL Parameters Helper
+        function updateUrlParams(params) {
+            const url = new URL(window.location.href);
+            Object.keys(params).forEach(key => {
+                if (params[key]) {
+                    url.searchParams.set(key, params[key]);
+                } else {
+                    url.searchParams.delete(key);
+                }
+            });
+            window.history.pushState({}, '', url);
+            window.location.reload();
+        }
+
+        // Search functionality
+        let searchTimeout;
+        function updateSearch(value) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                updateUrlParams({ search: value, page: 1 });
+            }, 500);
+        }
+
+        // Filter and Sort
+        function updateFilter(value) {
+            updateUrlParams({ filter: value, page: 1 });
+        }
+
+        function updateSort(value) {
+            updateUrlParams({ sort: value, page: 1 });
+        }
+
+        // Handle automatic alert dismissal
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.classList.add('fade-out');
+                    setTimeout(() => {
+                        alert.remove();
+                    }, 300);
+                }, 3000);
+            });
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                closeModal(event.target.id);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded');
+            console.log('Modal element:', document.getElementById('userViewModal'));
+            console.log('Alert container:', document.getElementById('alertContainer'));
+        });
+    </script>
     <script src="../js/admin/users.js"></script>
     <script src="../js/admin/navbar.js"></script>
 </body>

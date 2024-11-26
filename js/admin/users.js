@@ -1,62 +1,55 @@
 // File: js/admin/users.js
 
-// URL Parameters Helper
-function updateUrlParams(params) {
-    const url = new URL(window.location.href);
-    Object.keys(params).forEach(key => {
-        if (params[key]) {
-            url.searchParams.set(key, params[key]);
-        } else {
-            url.searchParams.delete(key);
-        }
-    });
-    window.history.pushState({}, '', url);
-    window.location.reload();
-}
-
-// Search functionality
-let searchTimeout;
-function updateSearch(value) {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => {
-        updateUrlParams({ search: value, page: 1 });
-    }, 500);
-}
-
-// Filter and Sort
-function updateFilter(value) {
-    updateUrlParams({ filter: value, page: 1 });
-}
-
-function updateSort(value) {
-    updateUrlParams({ sort: value, page: 1 });
-}
+// Base paths configuration
+const BASE_URL = '/Memoire'; // Update this to match your installation path
+const ADMIN_INCLUDES = `${BASE_URL}/includes/admin`;
 
 // View user details
-async function viewUser(userId) {
+async function viewUserDetails(userId) {
+    console.log('Viewing user:', userId); // Debug log
+    
     try {
-        const response = await fetch(`../includes/admin/get_user_view.inc.php?user_id=${userId}`);
-        if (!response.ok) throw new Error('Failed to fetch user details');
+        const response = await fetch(`${ADMIN_INCLUDES}/get_user_view.inc.php?user_id=${userId}`);
+        console.log('Response status:', response.status); // Debug log
+        
+        const contentType = response.headers.get('content-type');
+        console.log('Content type:', contentType); // Debug log
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const content = await response.text();
+        console.log('Response content:', content); // Debug log
         
         const modalContent = document.querySelector('#userViewModal .modal-content');
-        modalContent.innerHTML = await response.text();
+        modalContent.innerHTML = content;
         
-        document.getElementById('userViewModal').classList.add('show');
+        const modal = document.getElementById('userViewModal');
+        modal.classList.add('show');
         document.body.style.overflow = 'hidden';
         
     } catch (error) {
-        showAlert(error.message, 'error');
+        console.error('Error viewing user:', error); // Debug log
+        showAlert('Failed to load user details: ' + error.message, 'error');
+    }
+}
+
+// Delete user confirmation
+function deleteUserConfirm(userId, userName) {
+    console.log('Delete confirmation for user:', userId, userName); // Debug log
+    
+    if (confirm(`Are you sure you want to delete ${userName}? This action cannot be undone.`)) {
+        deleteUser(userId, userName);
     }
 }
 
 // Delete user
-async function deleteUser(userId) {
-    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-        return;
-    }
+async function deleteUser(userId, userName) {
+    console.log('Deleting user:', userId); // Debug log
     
     try {
-        const response = await fetch('../includes/admin/user_operations.inc.php', {
+        const response = await fetch(`${ADMIN_INCLUDES}/user_operations.inc.php`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -67,16 +60,14 @@ async function deleteUser(userId) {
             })
         });
 
-        if (!response.ok) {
-            throw new Error('Failed to delete user');
-        }
-
+        console.log('Delete response status:', response.status); // Debug log
         const data = await response.json();
-        
+        console.log('Delete response data:', data); // Debug log
+
         if (data.success) {
             showAlert('User deleted successfully', 'success');
             
-            // Find and remove the user card with animation
+            // Remove the user card with animation
             const userCard = document.querySelector(`[data-user-id="${userId}"]`);
             if (userCard) {
                 userCard.style.opacity = '0';
@@ -91,44 +82,74 @@ async function deleteUser(userId) {
                     }
                 }, 300);
             }
+
+            // Close modal if open
+            closeModal('userViewModal');
         } else {
             throw new Error(data.error || 'Failed to delete user');
         }
     } catch (error) {
+        console.error('Error deleting user:', error); // Debug log
         showAlert(error.message, 'error');
     }
 }
 
 // Alert functionality
 function showAlert(message, type = 'success') {
-    const alertContainer = document.createElement('div');
-    alertContainer.className = `alert alert-${type}`;
+    console.log('Showing alert:', type, message); // Debug log
     
-    alertContainer.innerHTML = `
+    const alertContainer = document.getElementById('alertContainer');
+    if (!alertContainer) {
+        console.error('Alert container not found!');
+        return;
+    }
+
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type}`;
+    
+    alert.innerHTML = `
         <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
         <span>${message}</span>
     `;
     
-    document.getElementById('alertContainer').appendChild(alertContainer);
+    alertContainer.appendChild(alert);
     
     setTimeout(() => {
-        alertContainer.classList.add('fade-out');
-        setTimeout(() => alertContainer.remove(), 300);
+        alert.classList.add('fade-out');
+        setTimeout(() => alert.remove(), 300);
     }, 3000);
 }
 
 // Modal functionality
 function closeModal(modalId) {
-    document.getElementById(modalId).classList.remove('show');
-    document.body.style.overflow = 'auto';
+    console.log('Closing modal:', modalId); // Debug log
+    
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = 'auto';
+    } else {
+        console.error('Modal not found:', modalId);
+    }
 }
 
-// Close modals when clicking outside
-document.addEventListener('click', (e) => {
-    const modals = document.querySelectorAll('.modal');
-    modals.forEach(modal => {
-        if (e.target === modal) {
-            closeModal(modal.id);
+// Initialize event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM Loaded - Initializing event listeners'); // Debug log
+
+    // Close modals when clicking outside
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal')) {
+            closeModal(event.target.id);
         }
+    };
+
+    // Handle automatic alert dismissal
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.classList.add('fade-out');
+            setTimeout(() => alert.remove(), 300);
+        }, 3000);
     });
 });

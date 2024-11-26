@@ -32,10 +32,6 @@ $profile_image_path = !empty($profile_image) ? "../" . $profile_image : "../asse
                 <i class="fas fa-flag"></i>
                 Reports
             </a>
-            <a href="settings.php" class="nav-link <?php echo ($current_page === 'settings.php') ? 'active' : ''; ?>">
-                <i class="fas fa-cog"></i>
-                Settings
-            </a>
         </div>
 
         <div class="nav-profile">
@@ -80,10 +76,6 @@ $profile_image_path = !empty($profile_image) ? "../" . $profile_image : "../asse
     <a href="reports.php" class="mobile-link <?php echo ($current_page === 'reports.php') ? 'active' : ''; ?>">
         <i class="fas fa-flag"></i>
         Reports
-    </a>
-    <a href="settings.php" class="mobile-link <?php echo ($current_page === 'settings.php') ? 'active' : ''; ?>">
-        <i class="fas fa-cog"></i>
-        Settings
     </a>
     
     <div class="mobile-profile">

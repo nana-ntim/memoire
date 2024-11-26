@@ -6,96 +6,102 @@ header('Content-Type: application/json');
 require_once "../../config/dbh.inc.php";
 require_once "../security/admin_security.inc.php";
 
-// Ensure request is made via POST
-if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-    http_response_code(405);
-    echo json_encode(['success' => false, 'error' => 'Method not allowed']);
-    die();
-}
-
-// Verify admin privileges
 try {
+    // Verify admin privileges
     $pdo = require_admin_priv();
-} catch (Exception $e) {
-    http_response_code(403);
-    echo json_encode(['success' => false, 'error' => 'Unauthorized access']);
-    die();
-}
 
-// Get JSON input
-$input = json_decode(file_get_contents('php://input'), true);
+    // Get JSON input
+    $input = json_decode(file_get_contents('php://input'), true);
 
-if (!isset($input['action']) || !isset($input['user_id'])) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'Missing required parameters']);
-    die();
-}
+    if (!isset($input['action']) || !isset($input['user_id'])) {
+        throw new Exception('Missing required parameters');
+    }
 
-// Handle user deletion
-if ($input['action'] === 'delete') {
-    try {
+    // Validate user_id
+    $user_id = filter_var($input['user_id'], FILTER_VALIDATE_INT);
+    if (!$user_id) {
+        throw new Exception('Invalid user ID');
+    }
+
+    // Handle user deletion
+    if ($input['action'] === 'delete') {
         // Start transaction
         $pdo->beginTransaction();
-        
-        // Get user data for cleanup
-        $query = "SELECT profile_image FROM Users WHERE user_id = :user_id AND is_admin = 0";
-        $stmt = $pdo->prepare($query);
-        $stmt->execute([':user_id' => $input['user_id']]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$user) {
-            throw new Exception('User not found or cannot delete admin user');
-        }
+        try {
+            // First, verify this is not an admin account
+            $query = "SELECT is_admin, profile_image FROM Users WHERE user_id = :user_id";
+            $stmt = $pdo->prepare($query);
+            $stmt->execute([':user_id' => $user_id]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Delete user's journal entries (will cascade to EntryMedia and CollectionEntries)
-        $query = "DELETE FROM JournalEntries WHERE user_id = :user_id";
-        $stmt = $pdo->prepare($query);
-        $stmt->execute([':user_id' => $input['user_id']]);
-
-        // Delete user's collections (will cascade to CollectionEntries)
-        $query = "DELETE FROM Collections WHERE user_id = :user_id";
-        $stmt = $pdo->prepare($query);
-        $stmt->execute([':user_id' => $input['user_id']]);
-
-        // Delete the user
-        $query = "DELETE FROM Users WHERE user_id = :user_id AND is_admin = 0";
-        $stmt = $pdo->prepare($query);
-        $stmt->execute([':user_id' => $input['user_id']]);
-
-        if ($stmt->rowCount() === 0) {
-            throw new Exception('Failed to delete user');
-        }
-
-        // Delete profile image if exists
-        if ($user['profile_image']) {
-            $profile_image_path = __DIR__ . "/../../" . $user['profile_image'];
-            if (file_exists($profile_image_path)) {
-                unlink($profile_image_path);
+            if (!$user) {
+                throw new Exception('User not found');
             }
+
+            if ($user['is_admin']) {
+                throw new Exception('Cannot delete admin user');
+            }
+
+            // Get files to delete
+            $query = "SELECT m.file_path
+                     FROM EntryMedia m
+                     JOIN JournalEntries e ON m.entry_id = e.entry_id
+                     WHERE e.user_id = :user_id";
+            $stmt = $pdo->prepare($query);
+            $stmt->execute([':user_id' => $user_id]);
+            $files_to_delete = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+            // Delete user (will cascade to entries and collections)
+            $query = "DELETE FROM Users WHERE user_id = :user_id AND is_admin = 0";
+            $stmt = $pdo->prepare($query);
+            $result = $stmt->execute([':user_id' => $user_id]);
+
+            if (!$result) {
+                throw new Exception('Failed to delete user');
+            }
+
+            // Delete associated files
+            foreach ($files_to_delete as $file_path) {
+                if ($file_path) {
+                    $full_path = __DIR__ . '/../../' . ltrim($file_path, '/');
+                    if (file_exists($full_path)) {
+                        unlink($full_path);
+                    }
+                }
+            }
+
+            // Delete profile image if exists
+            if ($user['profile_image']) {
+                $profile_path = __DIR__ . '/../../' . ltrim($user['profile_image'], '/');
+                if (file_exists($profile_path)) {
+                    unlink($profile_path);
+                }
+            }
+
+            // Commit transaction
+            $pdo->commit();
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'User deleted successfully'
+            ]);
+
+        } catch (Exception $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            throw $e;
         }
-
-        // Commit transaction
-        $pdo->commit();
-
-        echo json_encode([
-            'success' => true,
-            'message' => 'User deleted successfully'
-        ]);
-
-    } catch (Exception $e) {
-        if ($pdo->inTransaction()) {
-            $pdo->rollBack();
-        }
-        http_response_code(500);
-        echo json_encode([
-            'success' => false,
-            'error' => 'Failed to delete user: ' . $e->getMessage()
-        ]);
+    } else {
+        throw new Exception('Invalid action');
     }
-} else {
+
+} catch (Exception $e) {
+    error_log("Error in user_operations: " . $e->getMessage());
     http_response_code(400);
     echo json_encode([
         'success' => false,
-        'error' => 'Invalid action'
+        'error' => $e->getMessage()
     ]);
 }

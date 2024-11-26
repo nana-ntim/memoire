@@ -259,5 +259,6 @@ unset($_SESSION["settings_error"]);
             }
         }
     </script>
+    <script src="../js/admin/navbar.js"></script>
 </body>
 </html>

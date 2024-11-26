@@ -122,3 +122,120 @@ function get_user_statistics($pdo): array {
         ];
     }
 }
+
+function get_user_details($pdo, $user_id) {
+    try {
+        $query = "SELECT 
+                    u.*,
+                    COUNT(DISTINCT j.entry_id) as entry_count,
+                    COUNT(DISTINCT c.collection_id) as collection_count,
+                    UNIX_TIMESTAMP(u.last_login) as last_active
+                 FROM Users u
+                 LEFT JOIN JournalEntries j ON u.user_id = j.user_id
+                 LEFT JOIN Collections c ON u.user_id = c.user_id
+                 WHERE u.user_id = :user_id AND u.is_admin = 0
+                 GROUP BY u.user_id";
+                 
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([':user_id' => $user_id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Error fetching user details: " . $e->getMessage());
+        return false;
+    }
+}
+
+function get_user_recent_entries($pdo, $user_id, $limit = 5) {
+    try {
+        $query = "SELECT entry_id, title, created_at
+                 FROM JournalEntries 
+                 WHERE user_id = :user_id
+                 ORDER BY created_at DESC
+                 LIMIT :limit";
+                 
+        $stmt = $pdo->prepare($query);
+        $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Error fetching user recent entries: " . $e->getMessage());
+        return [];
+    }
+}
+
+function delete_user_data($pdo, $user_id) {
+    try {
+        $pdo->beginTransaction();
+
+        // Get files to delete
+        $query = "SELECT m.file_path 
+                 FROM EntryMedia m 
+                 JOIN JournalEntries e ON m.entry_id = e.entry_id 
+                 WHERE e.user_id = :user_id";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([':user_id' => $user_id]);
+        $files = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        // Get profile image
+        $query = "SELECT profile_image FROM Users WHERE user_id = :user_id AND is_admin = 0";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([':user_id' => $user_id]);
+        $profile_image = $stmt->fetchColumn();
+
+        // Delete user (cascades to entries and collections)
+        $query = "DELETE FROM Users WHERE user_id = :user_id AND is_admin = 0";
+        $stmt = $pdo->prepare($query);
+        $result = $stmt->execute([':user_id' => $user_id]);
+
+        if ($result) {
+            // Delete files
+            foreach ($files as $file_path) {
+                if ($file_path) {
+                    $full_path = __DIR__ . '/../../' . ltrim($file_path, '/');
+                    if (file_exists($full_path)) {
+                        unlink($full_path);
+                    }
+                }
+            }
+
+            // Delete profile image
+            if ($profile_image) {
+                $profile_path = __DIR__ . '/../../' . ltrim($profile_image, '/');
+                if (file_exists($profile_path)) {
+                    unlink($profile_path);
+                }
+            }
+
+            $pdo->commit();
+            return true;
+        }
+
+        throw new Exception("Failed to delete user");
+
+    } catch (Exception $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        error_log("Error deleting user data: " . $e->getMessage());
+        return false;
+    }
+}
+
+function validate_admin_action($pdo, $user_id) {
+    try {
+        $query = "SELECT is_admin FROM Users WHERE user_id = :user_id";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([':user_id' => $user_id]);
+        $is_admin = $stmt->fetchColumn();
+
+        if ($is_admin) {
+            throw new Exception("Cannot perform this action on an admin user");
+        }
+
+        return true;
+    } catch (PDOException $e) {
+        error_log("Error validating admin action: " . $e->getMessage());
+        return false;
+    }
+}

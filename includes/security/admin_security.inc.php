@@ -13,32 +13,43 @@ function require_admin_priv() {
         die();
     }
 
-    // Get database connection
-    require_once __DIR__ . "/../../config/dbh.inc.php";
-    // global $pdo;
-    
-    if (!$pdo) {
-        error_log("Database connection failed in admin_security.inc.php");
-        die("Database connection error");
-    }
-    
-    // Verify admin status
-    $query = "SELECT is_admin FROM Users WHERE user_id = :user_id";
-    $stmt = $pdo->prepare($query);
-    $stmt->execute([":user_id" => $_SESSION["user_id"]]);
-    $is_admin = $stmt->fetchColumn();
-    
-    if (!$is_admin) {
+    try {
+        // Get database connection
+        require_once __DIR__ . "/../../config/dbh.inc.php";
+        
+        // Verify database connection
+        if (!isset($pdo)) {
+            throw new Exception("Database connection failed");
+        }
+        
+        // Verify admin status
+        $query = "SELECT is_admin FROM Users WHERE user_id = :user_id";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([":user_id" => $_SESSION["user_id"]]);
+        $is_admin = $stmt->fetchColumn();
+        
+        if (!$is_admin) {
+            header("Location: ../pages/journal.php");
+            die();
+        }
+
+        return $pdo;
+
+    } catch (Exception $e) {
+        error_log("Admin security check error: " . $e->getMessage());
         header("Location: ../pages/journal.php");
         die();
     }
-
-    return $pdo;
 }
 
 function get_admin_data($pdo, $user_id) {
-    $query = "SELECT * FROM Users WHERE user_id = :user_id AND is_admin = TRUE";
-    $stmt = $pdo->prepare($query);
-    $stmt->execute([":user_id" => $user_id]);
-    return $stmt->fetch(PDO::FETCH_ASSOC);
+    try {
+        $query = "SELECT * FROM Users WHERE user_id = :user_id AND is_admin = TRUE";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([":user_id" => $user_id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        error_log("Error getting admin data: " . $e->getMessage());
+        return false;
+    }
 }
