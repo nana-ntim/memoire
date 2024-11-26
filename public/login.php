@@ -1,7 +1,7 @@
 <?php
-require_once "../includes/session_protection.inc.php";
-require_once "../includes/config_session.inc.php";
-require_once "../includes/login/login_view.inc.php";
+require_once "../includes/security/session_protection.inc.php";
+require_once "../config/config_session.inc.php";
+require_once "../includes/auth/login/login_view.inc.php";
 prevent_login_access();
 ?>
 
@@ -29,7 +29,7 @@ prevent_login_access();
                     check_login_errors();
                  ?>
 
-                <form class="signup-form" method="POST" action="../includes/login/login.inc.php">
+                <form class="signup-form" method="POST" action="../includes/auth/login/login.inc.php">
                     <div class="form-group">
                         <label for="email">Email</label>
                         <input type="email" id="email" name="email" placeholder="Enter your email">
