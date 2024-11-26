@@ -24,10 +24,6 @@ $profile_image_path = !empty($profile_image) ? "../" . $profile_image : "../asse
                 <i class="fas fa-chart-line"></i>
                 Dashboard
             </a>
-            <a href="users.php" class="nav-link <?php echo ($current_page === 'users.php') ? 'active' : ''; ?>">
-                <i class="fas fa-users"></i>
-                Users
-            </a>
             <a href="reports.php" class="nav-link <?php echo ($current_page === 'reports.php') ? 'active' : ''; ?>">
                 <i class="fas fa-flag"></i>
                 Reports
@@ -68,10 +64,6 @@ $profile_image_path = !empty($profile_image) ? "../" . $profile_image : "../asse
     <a href="dashboard.php" class="mobile-link <?php echo ($current_page === 'dashboard.php') ? 'active' : ''; ?>">
         <i class="fas fa-chart-line"></i>
         Dashboard
-    </a>
-    <a href="users.php" class="mobile-link <?php echo ($current_page === 'users.php') ? 'active' : ''; ?>">
-        <i class="fas fa-users"></i>
-        Users
     </a>
     <a href="reports.php" class="mobile-link <?php echo ($current_page === 'reports.php') ? 'active' : ''; ?>">
         <i class="fas fa-flag"></i>

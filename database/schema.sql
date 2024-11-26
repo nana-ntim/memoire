@@ -62,6 +62,30 @@ CREATE TABLE CollectionEntries (
     FOREIGN KEY (entry_id) REFERENCES JournalEntries(entry_id) ON DELETE CASCADE
 );
 
+-- Reflections table (Not initialized)
+CREATE TABLE Reflections (
+    reflection_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    question1 TEXT NOT NULL,
+    question2 TEXT NOT NULL,
+    question3 TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    INDEX idx_user_date (user_id, created_at DESC)
+);
+
+-- Add GratitudeEntries table (INITIALIZATION COMPLETE)
+CREATE TABLE GratitudeEntries (
+    entry_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    INDEX idx_user_date (user_id, created_at DESC)
+);
+
 -- Add full-text search index to JournalEntries
 ALTER TABLE JournalEntries 
 ADD FULLTEXT INDEX ft_entry_content (title, content);

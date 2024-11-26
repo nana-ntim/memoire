@@ -3,6 +3,11 @@
 // Setup data for the database connection
 // These can be changed with the right details
 // for any database
+// $host = 'localhost';
+// $dbname = 'webtech_fall2024_asamoah_ntim';
+// $dbusername = 'asamoah.ntim';
+// $dbpassword = 'Frimpomaah123#';
+
 $host = 'localhost';
 $dbname = 'memoire';
 $dbusername = 'root';

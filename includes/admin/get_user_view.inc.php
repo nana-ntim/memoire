@@ -102,7 +102,7 @@ try {
     </div>
     <div class="modal-actions">
         <button class="btn btn-secondary" onclick="closeModal('userViewModal')">Close</button>
-        <button class="btn btn-danger" onclick="deleteUser(<?php echo $user['user_id']; ?>, '<?php echo htmlspecialchars(addslashes($user['firstName'] . ' ' . $user['lastName'])); ?>')">Delete User</button>
+        <button class="btn btn-danger" onclick="deleteUserConfirm(<?php echo $user['user_id']; ?>, '<?php echo htmlspecialchars(addslashes($user['firstName'] . ' ' . $user['lastName'])); ?>')">Delete User</button>
     </div>
     <?php
 
