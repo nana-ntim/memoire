@@ -89,3 +89,6 @@ CREATE TABLE GratitudeEntries (
 -- Add full-text search index to JournalEntries
 ALTER TABLE JournalEntries 
 ADD FULLTEXT INDEX ft_entry_content (title, content);
+
+-- For adding the admin section
+ALTER TABLE Users ADD COLUMN is_admin TINYINT(1) DEFAULT 0;
